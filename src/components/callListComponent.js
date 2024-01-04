@@ -5,6 +5,20 @@ import CallReceivedIcon from "@mui/icons-material/CallReceived";
 import CallMissedIcon from "@mui/icons-material/CallMissed";
 import InfoIcon from "@mui/icons-material/Info";
 import Typography from "@mui/material/Typography";
+import data from "./../../public/data.json";
+import Button from "@mui/material/Button";
+import ListItemText from "@mui/material/ListItemText";
+
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Grid from "@mui/material/Grid";
+import FolderIcon from "@mui/icons-material/Folder";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const CallListComponent = () => {
   const [calls, setCalls] = useState([]);
@@ -30,11 +44,13 @@ const CallListComponent = () => {
 
   const fetchCalls = async () => {
     try {
-      const response = await axios.get(
-        "https://cerulean-marlin-wig.cyclic.app/activities"
-      );
+      // const baseURL = "https://cerulean-marlin-wig.cyclic.app";
+      // const response = await axios.get(`${baseURL}/activities`);
+      // setCalls(response.data);
 
-      setCalls(response.data);
+      const response = await fetch(data);
+      setCalls(data);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -81,43 +97,52 @@ const CallListComponent = () => {
 
   return (
     <div>
-      <h1>List of {showArchived ? "Archived" : "Unarchived"} Calls</h1>{" "}
-      <button onClick={toggleArchived}>
+      <Button
+        variant="outlined"
+        onClick={toggleArchived}
+        style={{ width: "100%", borderTop: "none" }}
+      >
         Show {showArchived ? "Unarchived" : "Archived"} Calls
-      </button>
+      </Button>
       <div style={{ maxHeight: "550px", overflowY: "auto" }}>
         {Object.entries(contactsByDate).map(([date, calls]) => (
           <div key={date} style={{ textAlign: "center" }}>
-            <Typography variant="h6">{date}</Typography>
-            <ul style={{ listStyle: "none", padding: 0 }}>
+            <Typography
+              variant="h6"
+              style={{ fontSize: "15px", color: "#8c8e8f" }}
+            >
+              {date}
+            </Typography>
+            <div style={{ listStyle: "none", padding: 0 }}>
               {calls.map((call) => (
-                <li
-                  key={call.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "8px",
-                    padding: "8px",
-                  }}
-                >
-                  {getCallIcon(call.direction)}
-                  <Typography variant="body1">
-                    <strong>{getCallNumber(call)}</strong>{" "}
-                    <div style={{ color: "lightgray" }}>
-                      {
+                <div key={call.id}>
+                  <ListItem
+                    secondaryAction={
+                      <IconButton edge="end" aria-label="delete">
+                        <InfoIcon
+                          style={{ marginRight: "8px", width: "20px" }}
+                        />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemAvatar>
+                      {getCallIcon(call.direction)}
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={getCallNumber(call)}
+                      secondary={
                         formatDateFromRFC3339(call.created_at)
                           .split(", ")[1]
                           .split(" ")[2]
                       }
-                    </div>
-                  </Typography>
-                  <InfoIcon style={{ marginRight: "8px" }} />
-                </li>
+                    />
+                  </ListItem>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         ))}
-      </div>{" "}
+      </div>
     </div>
   );
 };
